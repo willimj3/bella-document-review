@@ -113,6 +113,20 @@ Rules:
     });
   } catch (error) {
     console.error('Extraction error:', error);
+
+    // Check for rate limiting
+    if (error.status === 429) {
+      return res.status(429).json({
+        error: 'Rate limited by Anthropic API. Please wait a moment and try again.',
+        retryAfter: error.headers?.['retry-after'] || 60
+      });
+    }
+
+    // Check for auth errors
+    if (error.status === 401) {
+      return res.status(401).json({ error: 'Invalid API key' });
+    }
+
     res.status(500).json({ error: error.message || 'Extraction failed' });
   }
 });
