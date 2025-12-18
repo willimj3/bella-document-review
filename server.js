@@ -17,6 +17,11 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+// Root health check (for Railway)
+app.get('/', (req, res) => {
+  res.json({ status: 'ok', service: 'bella-api' });
+});
+
 // Health check
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', hasApiKey: !!process.env.ANTHROPIC_API_KEY });
@@ -181,7 +186,7 @@ When answering questions:
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on port ${PORT}`);
   console.log(`API Key configured: ${process.env.ANTHROPIC_API_KEY ? 'Yes' : 'No - set ANTHROPIC_API_KEY in .env'}`);
 });
