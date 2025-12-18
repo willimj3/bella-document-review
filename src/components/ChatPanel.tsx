@@ -41,7 +41,8 @@ export function ChatPanel() {
     documents,
     columns,
     extractionResults,
-    setSelectedCell
+    setSelectedCell,
+    selectedDocuments
   } = useStore();
 
   const [input, setInput] = useState('');
@@ -56,11 +57,16 @@ export function ChatPanel() {
   if (!isChatOpen) return null;
 
   const buildDataContext = () => {
-    const documentNames = documents.map(d => d.name);
+    // Only include selected documents, or all if none selected
+    const docsToInclude = selectedDocuments.length > 0
+      ? documents.filter(d => selectedDocuments.includes(d.id))
+      : documents;
+
+    const documentNames = docsToInclude.map(d => d.name);
     const columnInfo = columns.map(c => `${c.name}: ${c.prompt}`);
 
     const resultsSummary: Record<string, Record<string, { value: string; confidence: string }>> = {};
-    documents.forEach(doc => {
+    docsToInclude.forEach(doc => {
       resultsSummary[doc.name] = {};
       columns.forEach(col => {
         const result = extractionResults[doc.id]?.[col.id];
@@ -73,13 +79,17 @@ export function ChatPanel() {
       });
     });
 
+    const selectionNote = selectedDocuments.length > 0
+      ? `\n\nNote: Only analyzing the ${docsToInclude.length} selected document(s). Do not reference any other documents.`
+      : '';
+
     return `Documents: ${documentNames.join(', ')}
 
 Columns and their extraction prompts:
 ${columnInfo.join('\n')}
 
 Extraction Results:
-${JSON.stringify(resultsSummary, null, 2)}`;
+${JSON.stringify(resultsSummary, null, 2)}${selectionNote}`;
   };
 
   const handleSend = async () => {
