@@ -1,73 +1,96 @@
-# React + TypeScript + Vite
+# Bella - AI Document Review Tool
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+AI-powered document extraction and review tool that helps you analyze contracts, agreements, and other documents at scale.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Multi-Document Upload** - Drag & drop PDFs, DOCX, and TXT files
+- **Smart Extraction** - AI extracts key information using custom prompts
+- **Template System** - Pre-built templates for NDAs, Employment Agreements, Leases, etc.
+- **Quick Analyze** - Universal extraction for any document type
+- **Data Analyst Chat** - Ask questions about your documents
+- **Review Workflow** - Cell-level review with manual override capability
+- **Confidence Scoring** - AI provides confidence levels and source quotes
+- **CSV Export** - Export results for further analysis
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend**: React 18, TypeScript, Vite, Tailwind CSS v4
+- **State**: Zustand
+- **Tables**: TanStack Table (React Table v8)
+- **Backend**: Express.js
+- **AI**: Anthropic Claude API (claude-sonnet-4-20250514)
 
-## Expanding the ESLint configuration
+## Local Development
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/willimj3/bella-document-review.git
+   cd bella-document-review
+   ```
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+3. Create `.env` file with your Anthropic API key:
+   ```
+   ANTHROPIC_API_KEY=your_api_key_here
+   ```
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+4. Run both frontend and backend:
+   ```bash
+   npm run dev:all
+   ```
+
+5. Open http://localhost:5173
+
+## Deployment
+
+### Frontend (Vercel)
+
+1. Go to [vercel.com](https://vercel.com) and import your GitHub repo
+2. Set build settings:
+   - Framework: Vite
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+3. Add environment variable:
+   - `VITE_API_URL`: Your Railway backend URL (e.g., `https://your-app.railway.app`)
+4. Deploy
+
+### Backend (Railway)
+
+1. Go to [railway.app](https://railway.app) and create new project from GitHub
+2. Select this repository
+3. Configure settings:
+   - Start Command: `node server.js`
+   - Port: `3001`
+4. Add environment variables:
+   - `ANTHROPIC_API_KEY`: Your Anthropic API key
+   - `PORT`: `3001`
+5. Deploy
+
+### Environment Variables
+
+| Variable | Where | Description |
+|----------|-------|-------------|
+| `ANTHROPIC_API_KEY` | Backend (Railway) | Your Anthropic API key |
+| `VITE_API_URL` | Frontend (Vercel) | Backend API URL |
+| `PORT` | Backend (Railway) | Server port (default: 3001) |
+
+## Project Structure
+
+```
+├── src/
+│   ├── components/      # React components
+│   ├── store/           # Zustand store
+│   ├── utils/           # Extraction, export, parsing utilities
+│   └── types/           # TypeScript types
+├── server.js            # Express backend with Claude API
+└── public/              # Static assets
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## License
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+MIT
