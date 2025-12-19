@@ -86,15 +86,34 @@ Rules:
       ? documentText.slice(0, maxDocLength) + '\n\n[Document truncated...]'
       : documentText;
 
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
-      system: EXTRACTION_SYSTEM_PROMPT,
-      messages: [{
-        role: 'user',
-        content: `Document:\n${truncatedDoc}\n\nExtraction Query: ${columnPrompt}\nExpected Type: ${columnType}\n${typeInstructions}`
-      }]
-    });
+    // Retry with exponential backoff for rate limits
+    let response;
+    let retries = 0;
+    const maxRetries = 3;
+
+    while (retries <= maxRetries) {
+      try {
+        response = await anthropic.messages.create({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1024,
+          system: EXTRACTION_SYSTEM_PROMPT,
+          messages: [{
+            role: 'user',
+            content: `Document:\n${truncatedDoc}\n\nExtraction Query: ${columnPrompt}\nExpected Type: ${columnType}\n${typeInstructions}`
+          }]
+        });
+        break; // Success, exit retry loop
+      } catch (apiError) {
+        if (apiError.status === 429 && retries < maxRetries) {
+          retries++;
+          const waitTime = Math.pow(2, retries) * 1000; // 2s, 4s, 8s
+          console.log(`Rate limited, waiting ${waitTime/1000}s before retry ${retries}/${maxRetries}`);
+          await new Promise(resolve => setTimeout(resolve, waitTime));
+        } else {
+          throw apiError;
+        }
+      }
+    }
 
     const content = response.content[0];
     if (content.type !== 'text') {

@@ -81,14 +81,17 @@ export async function runBulkExtraction(
   const total = cellsToExtract.length;
   let current = 0;
 
-  // Process in parallel with concurrency limit
-  const concurrencyLimit = 3;
+  // Process in parallel with concurrency limit (reduced to avoid rate limits)
+  const concurrencyLimit = 2;
   const queue = [...cellsToExtract];
 
   const processNext = async (): Promise<void> => {
     while (queue.length > 0) {
       const cell = queue.shift();
       if (!cell) break;
+
+      // Small delay between requests to avoid rate limits
+      await new Promise(resolve => setTimeout(resolve, 500));
 
       try {
         // Mark as loading
