@@ -94,7 +94,7 @@ Rules:
     while (retries <= maxRetries) {
       try {
         response = await anthropic.messages.create({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-opus-4-20250514',
           max_tokens: 1024,
           system: EXTRACTION_SYSTEM_PROMPT,
           messages: [{
@@ -187,7 +187,7 @@ When answering questions:
     ];
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-opus-4-20250514',
       max_tokens: 2048,
       system: CHAT_SYSTEM_PROMPT,
       messages
