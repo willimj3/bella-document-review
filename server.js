@@ -93,13 +93,29 @@ Rules:
 
     while (retries <= maxRetries) {
       try {
-        response = await anthropic.messages.create({
+response = await anthropic.messages.create({
           model: 'claude-opus-4-20250514',
           max_tokens: 1024,
-          system: EXTRACTION_SYSTEM_PROMPT,
+          system: [
+            {
+              type: 'text',
+              text: EXTRACTION_SYSTEM_PROMPT,
+              cache_control: { type: 'ephemeral' }
+            }
+          ],
           messages: [{
             role: 'user',
-            content: `Document:\n${truncatedDoc}\n\nExtraction Query: ${columnPrompt}\nExpected Type: ${columnType}\n${typeInstructions}`
+            content: [
+              {
+                type: 'text',
+                text: `Document:\n${truncatedDoc}`,
+                cache_control: { type: 'ephemeral' }
+              },
+              {
+                type: 'text',
+                text: `\n\nExtraction Query: ${columnPrompt}\nExpected Type: ${columnType}\n${typeInstructions}`
+              }
+            ]
           }]
         });
         break; // Success, exit retry loop
