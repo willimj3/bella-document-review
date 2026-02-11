@@ -1,10 +1,11 @@
 import * as pdfjsLib from 'pdfjs-dist';
+import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import mammoth from 'mammoth';
 import { v4 as uuidv4 } from 'uuid';
 import type { Document, DocumentPage } from '../types';
 
 // Set the worker source for PDF.js
-pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker;
 
 export async function parsePDF(file: File): Promise<{ content: string; pages: DocumentPage[] }> {
   const arrayBuffer = await file.arrayBuffer();
